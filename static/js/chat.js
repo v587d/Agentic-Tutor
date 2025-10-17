@@ -473,7 +473,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ========== 事件监听 ==========
 
-    // 页面加载完成后聚焦输入框
+    // 处理移动设备上的键盘弹出
+    window.addEventListener('resize', () => {
+        if (document.activeElement === messageInput) {
+            setTimeout(() => {
+                messageInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+    });
+
     messageInput.focus();
     checkAuthStatus();
     // 点击发送按钮

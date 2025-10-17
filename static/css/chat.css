@@ -40,6 +40,10 @@ body {
 }
 
 .header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);
     padding: 10px 20px;
@@ -80,6 +84,10 @@ body {
     /* 添加滚动条样式 */
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+    margin-top: 60px;
+    /* Adjust for fixed header */
+    margin-bottom: 60px;
+    /* Adjust for fixed input */
 }
 
 /* 添加 WebKit 浏览器的滚动条样式 */
@@ -219,6 +227,10 @@ body.dark-theme .close-btn {
 }
 
 .input-container {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 1000;
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);
     padding: calc(var(--mobile-padding) - 2px);
@@ -671,7 +683,8 @@ body.dark-theme .header-icon {
 }
 
 .login-reminder {
-    margin: 10px 20px;
+    margin: 70px 20px 10px 20px;
+    /* Adjust top margin for fixed header */
     padding: 10px 14px;
     border-radius: 16px;
     background: rgba(255, 193, 7, 0.16);
