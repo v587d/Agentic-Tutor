@@ -27,8 +27,8 @@ Agentic Tutor is an intelligent tutoring system that leverages AI agents to prov
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
-   cd Agentic-Tutor
+   git clone https://github.com/v587d/Agentic-Tutor.git "Agentic Tutor"
+   cd "Agentic Tutor"
    ```
 
 2. Install dependencies:

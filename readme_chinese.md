@@ -27,8 +27,8 @@ Agentic Tutor 是一个智能辅导系统，利用AI代理为儿童提供个性�
 1. 克隆仓库：
 
    ```bash
-   git clone <仓库地址>
-   cd Agentic-Tutor
+   git clone https://github.com/v587d/Agentic-Tutor.git "Agentic Tutor"
+   cd "Agentic Tutor"
    ```
 
 2. 安装依赖：
