@@ -1,0 +1,270 @@
+@import url('/static/css/fonts.css');
+/* 引入通用字体 */
+
+.login-page-body {
+    font-family: 'Smiley Sans', sans-serif;
+    color: var(--text-color);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-size: 16px;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    overflow-x: hidden;
+    /* 防止横向滚动 */
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.login-container {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background: var(--form-bg-color);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: var(--box-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-sizing: border-box;
+    --primary-color: #007bff;
+    --primary-color-dark: #0056b3;
+    --form-bg-color: rgba(255, 255, 255, 0.85);
+    --input-border-color: #ccc;
+    --input-focus-border-color: #007bff;
+    --box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.logo-area {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo-area h2 {
+    /* margin: 0; */
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.logo-area p {
+    margin: 10px 0 0;
+    color: #555;
+    font-size: 0.8rem;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.input-group label {
+    display: none;
+    /* We use placeholders and icons instead */
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    /* Left padding for icon */
+    border: 1px solid var(--input-border-color);
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: all 0.3s;
+    background-color: #fff;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--input-focus-border-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+.input-group input:focus+.input-icon,
+.input-group:focus-within .input-icon {
+    color: var(--primary-color);
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-color-dark));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 2px;
+}
+
+.login-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.login-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+.links a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.9rem;
+}
+
+.back-link a {
+    color: #777;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.back-link a:hover {
+    color: var(--primary-color);
+}
+
+.error-message,
+.success-message {
+    width: 100%;
+    padding: 12px 16px;
+    margin: 12px 0 8px 0;
+    /* 调整 margin，确保按钮上方有空间 */
+    border-radius: 12px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    /* 确保 padding 不影响宽度 */
+    animation: fadeInMobile 0.4s ease-out;
+    line-height: 1.4;
+    /* 改善文本对齐 */
+}
+
+.error-message {
+    background-color: #fff2f0;
+    color: #ff4d4f;
+    border: 1px solid #ffccc7;
+}
+
+.success-message {
+    background-color: #f6ffed;
+    color: #52c41a;
+    border: 1px solid #b7eb8f;
+}
+
+@keyframes fadeInMobile {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 480px) {
+    .login-box {
+        padding: 15px;
+        /* 移动端减小 padding */
+        margin: 10px;
+        width: calc(100% - 20px);
+        /* 确保不超出屏幕 */
+    }
+
+    .logo-area h2 {
+        font-size: 1.3rem;
+    }
+
+    .input-group input {
+        font-size: 14px;
+        /* 防止iOS缩放 */
+    }
+
+    .login-btn {
+        padding: 14px;
+        font-size: 1.1rem;
+    }
+
+    .links {
+        font-size: 0.85rem;
+    }
+
+    .back-link {
+        font-size: 0.80rem;
+    }
+
+    .error-message,
+    .success-message {
+        padding: 14px 18px;
+        margin: 10px 0 6px 0;
+        /* 移动端调整 margin，确保紧贴按钮上方 */
+        font-size: 1.05rem;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        width: 100%;
+        /* 强制全宽对齐 */
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    /* 确保在小屏下消息不溢出 */
+    .login-box>.error-message,
+    .login-box>.success-message {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}

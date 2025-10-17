@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Kids AI Tutor - An AI agent that supports Chinese kids in growing happily">
+    <meta name="keywords" content="AI, learning, kid, agent, 教育, 儿童, 学习, 智能体, 人工智能">
+    <meta name="author" content="Xiong Hui">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids AI Tutor</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/fonts.css">
+    <link rel="stylesheet" href="/static/css/chat.css">
+    <link rel="stylesheet" href="/static/css/prism-1.29.0/prism.min.css">
+    <script src="/static/js/marked-9.1.2/marked.min.js"></script>
+    <script src="/static/js/prism-1.29.0/prism.min.js"></script>
+
+</head>
+
+<body>
+    <!-- 设置侧边栏 -->
+    <!-- ...existing code... -->
+
+    <!-- 设置侧边栏 -->
+    <div id="settings-panel" class="settings-panel">
+        <div class="settings-header">
+            <div class="header-title">
+                <img src="/static/favicon.ico" alt="Icon" class="header-icon">
+                <h2>Kids AI Tutor</h2>
+            </div>
+            <button id="close-settings" class="close-btn">&times;</button>
+        </div>
+        <div class="settings-content">
+            <div id="userInfo" class="user-info" hidden>
+                <div class="user-info-row">
+                    <div class="user-avatar" id="userAvatarFallback" style="margin-left: 10px;"></div>
+                    <div class="user-name" id="userName"></div>
+                    <button id="logoutButton" class="logout-btn">
+                        <svg class="logout-icon" viewBox="0 0 24 24" width="16" height="16">
+                            <path fill="currentColor"
+                                d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 012 2v2h-2V4H5v16h9v-2h2v2a2 2 0 01-2 2H5a2 2 0 01-2-2V4a2 2 0 012-2h9z" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="menu-section">
+                    <div class="menu-item">
+                        <div class="menu-header" data-target="persona-menu">
+                            <span>Persona</span>
+                            <svg class="menu-arrow" viewBox="0 0 24 24" width="16" height="16">
+                                <path fill="currentColor" d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+                            </svg>
+                        </div>
+                        <div id="persona-menu" class="menu-content">
+                            <!-- Persona content will be added here -->
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-header" data-target="session-menu">
+                            <span>Chat sessions</span>
+                            <svg class="menu-arrow" viewBox="0 0 24 24" width="16" height="16">
+                                <path fill="currentColor" d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+                            </svg>
+                        </div>
+                        <div id="session-menu" class="menu-content">
+                            <div class="session-list">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="login-wrapper" id="loginWrapper">
+                <div class="setting-item login-item">
+                    <a href="/static/pages/login.html" class="login-link">Sign in</a>
+                    <div class="login-description">For full access to all features.</div>
+                </div>
+            </div>
+            <!-- 更多设置项可以放在这里 -->
+        </div>
+        <!-- 将 dark-mode-wrapper 移到 settings-panel 的直接子元素，作为底部固定部分 -->
+        <div class="dark-mode-wrapper">
+            <div class="setting-item" style="padding-left: 10px;">
+                <span>Dark mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle-switch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ...existing code... -->
+    <!-- 遮罩层 -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- 标题栏 -->
+    <div class="header">
+        <div class="header-content">
+            <div id="menu-icon" class="hamburger-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 错误提示区域 -->
+    <div id="errorMessage" class="error-message"></div>
+    <div id="loginReminder" class="login-reminder" hidden></div>
+
+    <!-- 聊天消息区域 -->
+    <div id="chatContainer" class="chat-container">
+        <!-- 消息会动态添加到这里 -->
+    </div>
+    <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+    <!-- 输入区域 -->
+
+    <div class="input-container">
+        <input type="text" id="messageInput" placeholder="🪄New message..." autocomplete="off">
+        <button id="sendButton">🚀</button>
+    </div>
+
+    <script src="/static/js/chat.js"></script>
+
+    <footer class="footer">
+        <p>&copy; 2025 Kids AI Tutor. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,47 @@
+{
+    // --- 基础编辑器 ---
+    "editor.fontSize": 14, // 设置编辑器字体大小
+    "editor.fontFamily": "'JetBrains Mono', 'Consolas', 'Courier New', monospace, 'LXGW WenKai'", // 英文字体为JetBrains Mono，中文字体为LXGW WenKai
+    "editor.tabSize": 4, // 设置tab为4个空格
+    "editor.lineHeight": 1.7, // 设置行高
+    "editor.minimap.enabled": false, // 禁用右侧的迷你地图，节省性能
+    "editor.cursorBlinking": "smooth", // 光标平滑闪烁
+    "editor.bracketPairColorization.enabled": true, // 启用括号对着色
+    // --- 保存时自动操作 ---
+    "editor.formatOnSave": true, // 保存时自动格式化代码
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit", // 保存时自动修复所有可修复的 ESLint 错误
+        "source.organizeImports": "explicit" // 保存时自动整理 import 语句
+    },
+    // --- 终端 ---
+    "terminal.integrated.defaultProfile.windows": "PowerShell", // Windows下默认终端为PowerShell
+    "terminal.integrated.fontSize": 14, // 终端字体大小
+    // --- python ---
+    "python.analysis.extraPaths": [
+        "./src"
+    ],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.formatting.provider": "black", // 使用 black 格式化代码
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe", // 指定虚拟环境
+    // --- 其他 ---
+    "workbench.iconTheme": "material-icon-theme", // 设置图标主题为material-icon-theme
+    "window.zoomLevel": 0, // 设置缩放级别为默认
+    "explorer.confirmDragAndDrop": false, // 禁用拖拽文件时的确认提示
+    "explorer.confirmDelete": false,
+    "Codegeex.RepoIndex": true, // 禁用删除文件时的确认提示
+    // --- 文件与搜索 ---
+    // "files.autoSave": "afterDelay", // 文件自动保存延迟
+    // "files.autoSaveDelay": 1000, // 1秒后自动保存
+    // "files.exclude": {
+    //     "**/.git": true, // 在文件搜索中排除 .git 文件夹
+    //     "**/node_modules": true, // 排除 node_modules
+    //     "**/dist": true, // 排除构建产物文件夹
+    //     "**/build": true
+    // },
+    // "search.exclude": {
+    //     "**/node_modules": true, // 在全局搜索中排除 node_modules
+    //     "**/dist": true,
+    //     "**/build": true
+    // },
+}

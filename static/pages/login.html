@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Kids AI Tutor</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+
+<body class="login-page-body">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo-area">
+                <h2 id="pageTitle">Kids AI Tutor</h2>
+                <p id="slogan">Growing partner – <strong>FREE</strong> forever🌈</p>
+            </div>
+            <form id="authForm">
+                <div class="input-group">
+                    <span class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z" />
+                        </svg>
+                    </span>
+                    <input type="email" id="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="input-group">
+                    <span class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 9a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V9z" />
+                        </svg>
+                    </span>
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+                <button type="submit" id="submitBtn" class="login-btn">Continue</button>
+            </form>
+
+            <div class="links" id="authLinks">
+                <a href="#" id="forgotLink">Password?</a>
+                <a href="#" id="signupLink">Sign up →</a>
+            </div>
+            <div class="links" id="backToLogin" style="display: none;">
+                <a href="#" id="backLink">Back to login</a>
+            </div>
+            <div class="back-link" id="backToChat">
+                <a href="/">Try as a guest~~</a>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/login.js"></script>
+</body>
+
+</html>
