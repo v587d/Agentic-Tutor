@@ -40,6 +40,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return `session_${timestamp}_${random}_${hash}`;
     }
 
+    // 设置菜单图标状态的辅助函数
+    function setMenuIconState(menuHeader, isLoading) {
+        const arrow = menuHeader.querySelector('.menu-arrow');
+        const existingSpinner = menuHeader.querySelector('.loading-spinner');
+
+        if (isLoading) {
+            // 移除箭头，添加loading spinner
+            if (arrow) arrow.style.display = 'none';
+            if (!existingSpinner) {
+                const spinner = document.createElement('div');
+                spinner.className = 'loading-spinner';
+                menuHeader.appendChild(spinner);
+            }
+        } else {
+            // 移除loading spinner，显示箭头
+            if (existingSpinner) existingSpinner.remove();
+            if (arrow) arrow.style.display = '';
+        }
+    }
+
     function updateTokenInfo() {
         const keys = ['access_token', 'token'];
         for (const key of keys) {
@@ -276,6 +296,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentTokenInfo) return;
 
         try {
+            // 测试用延迟 - 2秒钟
+            // await new Promise(resolve => setTimeout(resolve, 2000));
+
             const response = await fetch(`${SESSIONS}${await getUserId()}`, {
                 headers: {
                     'Accept': 'application/json',
@@ -496,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 菜单选项图标反转
-    sessionMenuHeader?.addEventListener('click', () => {
+    sessionMenuHeader?.addEventListener('click', async () => {
         // 切换 active 类来控制显示/隐藏
         sessionMenu.classList.toggle('active');
         // 切换图标方向
@@ -504,9 +527,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (arrow) {
             arrow.classList.toggle('rotate-90');
         }
+        // 如果打开 Chat sessions 菜单，加载会话数据
+        if (sessionMenu.classList.contains('active')) {
+            setMenuIconState(sessionMenuHeader, true);
+            try {
+                await loadChatSessions();
+            } finally {
+                setMenuIconState(sessionMenuHeader, false);
+            }
+        }
     });
 
-    personaMenuHeader?.addEventListener('click', () => {
+    personaMenuHeader?.addEventListener('click', async () => {
         // 切换 active 类来控制显示/隐藏
         personaMenu.classList.toggle('active');
         // 切换图标方向
@@ -516,7 +548,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         // 如果打开 Persona 菜单，加载 Persona 数据
         if (personaMenu.classList.contains('active')) {
-            loadPersonaSettings();
+            setMenuIconState(personaMenuHeader, true);
+            try {
+                await loadPersonaSettings();
+            } finally {
+                setMenuIconState(personaMenuHeader, false);
+            }
         }
     });
 
@@ -533,6 +570,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentTokenInfo) return;
 
         try {
+            // 测试用延迟 - 2秒钟
+            // await new Promise(resolve => setTimeout(resolve, 2000));
+
             // 获取用户的所有 persona
             const response = await fetch('user/persona', {
                 headers: {

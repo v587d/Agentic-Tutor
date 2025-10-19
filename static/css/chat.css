@@ -1887,6 +1887,33 @@ body.dark-theme .cancel-btn:hover {
     }
 }
 
+/* Loading spinner animation */
+.loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dark theme loading spinner */
+body.dark-theme .loading-spinner {
+    border-color: #4a5568;
+    border-top-color: var(--primary-color);
+}
+
 /* Help text styles */
 .help-text {
     color: var(--text-muted);
