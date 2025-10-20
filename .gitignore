@@ -5,7 +5,10 @@ build/
 dist/
 wheels/
 *.egg-info
-clean_cache.py
+/clean_cache.py
+/test*.py
+.continue/
+.github/
 # Virtual environments
 .venv/
 .env
@@ -13,3 +16,7 @@ clean_cache.py
 logs/
 .idea/
 database/
+
+design_doc/
+uploading/
+temp_deleted_files/

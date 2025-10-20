@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-from src.api.routers import chat, user, session
+from src.api.routers import chat, user, session, file
 from src.db.db import db_manager
 
 def create_app() -> FastAPI:
@@ -35,6 +35,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(chat.router)
-    app.include_router(user.router) 
+    app.include_router(user.router)
     app.include_router(session.router)
+    app.include_router(file.router)
     return app

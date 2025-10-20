@@ -3,20 +3,23 @@ import uuid
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 
-from sqlalchemy import String, Text, DateTime, ForeignKey, Index, text
+from sqlalchemy import String, Text, DateTime, ForeignKey, Index, text, Integer, Boolean
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
 
-from src.schemas.profile import LearningConfig, ProfileConfig
-from src.utils.logger import logger
+from ..schemas import (
+    LearningConfig, 
+    ProfileConfig, 
+    FileType,
+)
+from ..utils import logger
+
 
 def gen_uuid_str() -> str:
     return str(uuid.uuid4())
 
-
 class Base(DeclarativeBase):
     pass
-
 
 class User(Base):
     __tablename__ = "users"
@@ -46,6 +49,9 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan", lazy="raise"
     )
     sessions: Mapped[List["ChatSession"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", lazy="raise"
+    )
+    files: Mapped[List["UserFile"]] = relationship(
         back_populates="user", cascade="all, delete-orphan", lazy="raise"
     )
 
@@ -255,6 +261,9 @@ class ChatSession(Base):
         foreign_keys=[last_msg_id],
         primaryjoin="ChatSession.last_msg_id == ChatMessage.id"
     )
+    files: Mapped[List["UserFile"]] = relationship(
+        back_populates="session", cascade="all, delete-orphan", lazy="raise"
+    )
 
 class ChatMessage(Base):
     __tablename__ = "chat_messages"
@@ -283,4 +292,42 @@ class ChatMessage(Base):
 
     __table_args__ = (
         Index("ix_chat_messages_session_time", "session_id", "created_at"),
+    )
+
+class UserFile(Base):
+    __tablename__ = "user_files"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=gen_uuid_str)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    session_id: Mapped[Optional[str]] = mapped_column(ForeignKey("chat_sessions.id", ondelete="CASCADE"), index=True, nullable=True)
+    
+    file_url: Mapped[str] = mapped_column(String(512))  # 文件在服务器上的存储路径
+    file_type: Mapped[FileType] = mapped_column(String(32))  # 文件类型枚举
+    file_name: Mapped[str] = mapped_column(String(255))  # 原始文件名
+    file_size: Mapped[int] = mapped_column(Integer)  # 文件大小（字节）
+    mime_type: Mapped[str] = mapped_column(String(128))  # MIME类型
+    
+    version: Mapped[int] = mapped_column(Integer, default=1)  # 版本号
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)  # 是否活跃
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # 文件描述
+    
+    # 避免与 Base.metadata 冲突：Python属性叫 meta，列名仍叫 "metadata"
+    meta: Mapped[Optional[Dict[str, Any]]] = mapped_column("metadata", JSON, nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=text("(CURRENT_TIMESTAMP)"))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=text("(CURRENT_TIMESTAMP)"),
+        onupdate=text("(CURRENT_TIMESTAMP)"),
+    )
+
+    user: Mapped[User] = relationship(back_populates="files")
+    session: Mapped[ChatSession] = relationship(back_populates="files")
+
+    __table_args__ = (
+        Index("ix_user_files_user_session", "user_id", "session_id"),
+        Index("ix_user_files_file_type", "file_type"),
+        Index("ix_user_files_created_at", "created_at"),
     )
