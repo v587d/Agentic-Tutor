@@ -1,5 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // ========== 移动端键盘处理 ==========
+    function setupMobileKeyboardHandling() {
+        if (window.visualViewport) {
+            const inputContainer = document.querySelector('.input-container');
+            const chatContainer = document.getElementById('chatContainer');
+
+            const syncKeyboardGap = () => {
+                const offset = window.innerHeight - window.visualViewport.height;
+                if (offset > 0) {
+                    // 键盘弹出时，调整输入框位置
+                    inputContainer.style.transform = `translateY(-${offset}px)`;
+                    // 确保聊天内容可见
+                    chatContainer.style.marginBottom = `${offset + 60}px`;
+                } else {
+                    // 键盘收起时，恢复原状
+                    inputContainer.style.transform = '';
+                    chatContainer.style.marginBottom = '60px';
+                }
+            };
+
+            window.visualViewport.addEventListener('resize', syncKeyboardGap);
+            window.visualViewport.addEventListener('scroll', syncKeyboardGap);
+
+            // 初始调用一次
+            syncKeyboardGap();
+        }
+    }
+
     // ========== 配置区域 ==========
     const HOST_AGENT = 'chat/stream';
     const USER_INFO = 'user/me';
@@ -1483,6 +1511,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     is_default: isDefault
                 })
             });
+
+            // 初始化移动端键盘处理
+            setupMobileKeyboardHandling();
 
             if (!response.ok) {
                 throw new Error('Failed to update default persona');
