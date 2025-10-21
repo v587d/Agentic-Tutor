@@ -117,9 +117,12 @@ async def download_file(
                 detail="无权访问此文件"
             )
         
+        # 构建完整的文件路径
+        full_file_path = str(Path(file_path))
+        
         # 检查文件是否存在
         import os
-        if not os.path.exists(file_path):
+        if not os.path.exists(full_file_path):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="文件不存在"
@@ -129,11 +132,31 @@ async def download_file(
         filename_part = path_parts[-1]
         original_filename = '_'.join(filename_part.split('_')[1:])  # 移除UUID前缀
         
+        # 根据文件扩展名设置正确的MIME类型
+        file_extension = Path(original_filename).suffix.lower()
+        media_type = "application/octet-stream"  # 默认通用类型
+        
+        if file_extension == '.pdf':
+            media_type = 'application/pdf'
+        elif file_extension in ['.jpg', '.jpeg']:
+            media_type = 'image/jpeg'
+        elif file_extension == '.png':
+            media_type = 'image/png'
+        elif file_extension == '.gif':
+            media_type = 'image/gif'
+        elif file_extension == '.txt':
+            media_type = 'text/plain'
+        elif file_extension in ['.doc', '.docx']:
+            media_type = 'application/msword'
+        
         # 返回文件
         return FileResponse(
-            path=file_path,
+            path=full_file_path,
             filename=original_filename,
-            media_type="application/octet-stream"  # 通用MIME类型
+            media_type=media_type,
+            headers={
+                "Content-Disposition": f"attachment; filename=\"{original_filename}\""
+            }
         )
         
     except HTTPException:
@@ -212,9 +235,12 @@ async def delete_file(
             )
         
         # 从file_url中提取实际文件路径
-        # file_url格式: /file/download/{file_path}
-        # file_path = user_file.file_url.replace("/file/download/", "")
-        file_path = user_file.file_url
+        # file_url格式: /file/download/static/uploading/{user_id}/{session_id}/{file_id}_{filename}
+        # 需要移除前面的"/file/download/"部分
+        if user_file.file_url.startswith("/file/download/"):
+            file_path = user_file.file_url.replace("/file/download/", "")
+        else:
+            file_path = user_file.file_url
         
         # 移动物理文件到temp文件夹
         await delete_file_from_storage(file_path)

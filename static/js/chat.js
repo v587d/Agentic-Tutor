@@ -1,5 +1,113 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // ========== 自定义确认对话框 ==========
+    function showConfirmDialog(title, message, fileInfo = null) {
+        return new Promise((resolve) => {
+            // 移除现有对话框
+            const existingDialog = document.getElementById('confirm-dialog-overlay');
+            if (existingDialog) {
+                existingDialog.remove();
+            }
+
+            const dialogHtml = `
+                <div id="confirm-dialog-overlay" class="confirm-dialog-overlay">
+                    <div class="confirm-dialog">
+                        <div class="confirm-dialog-header">
+                            <h3 class="confirm-dialog-title">${escapeHtml(title)}</h3>
+                        </div>
+                        <div class="confirm-dialog-content">
+                            ${fileInfo ? `
+                                <div class="confirm-file-info">
+                                    <div class="confirm-file-name">${escapeHtml(fileInfo.name)}</div>
+                                    <div class="confirm-file-size">${escapeHtml(fileInfo.size)}</div>
+                                </div>
+                            ` : ''}
+                            <p class="confirm-dialog-message">${escapeHtml(message)}</p>
+                        </div>
+                        <div class="confirm-dialog-actions">
+                            <button class="confirm-cancel-btn" type="button">Cancel</button>
+                            <button class="confirm-delete-btn" type="button">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', dialogHtml);
+            const overlay = document.getElementById('confirm-dialog-overlay');
+
+            // 使用事件委托，避免复杂的事件绑定
+            const handleClick = (e) => {
+                // 检查点击的是取消按钮
+                if (e.target.classList.contains('confirm-cancel-btn')) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    resolve(false);
+                    overlay.remove();
+                    return;
+                }
+
+                // 检查点击的是删除按钮
+                if (e.target.classList.contains('confirm-delete-btn')) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    resolve(true);
+                    overlay.remove();
+                    return;
+                }
+
+                // 检查点击的是外部区域
+                if (e.target === overlay) {
+                    resolve(false);
+                    overlay.remove();
+                    return;
+                }
+            };
+
+            // 直接在按钮上添加事件监听器作为备用方案
+            const cancelBtn = overlay.querySelector('.confirm-cancel-btn');
+            const deleteBtn = overlay.querySelector('.confirm-delete-btn');
+
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    resolve(false);
+                    overlay.remove();
+                });
+            }
+
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    resolve(true);
+                    overlay.remove();
+                });
+            }
+
+            // ESC键关闭
+            const handleKeydown = (e) => {
+                if (e.key === 'Escape') {
+                    resolve(false);
+                    overlay.remove();
+                }
+            };
+
+            // 使用事件委托，在overlay上监听所有点击
+            overlay.addEventListener('click', handleClick);
+            document.addEventListener('keydown', handleKeydown);
+
+            // 清理事件监听器
+            const cleanup = () => {
+                overlay.removeEventListener('click', handleClick);
+                document.removeEventListener('keydown', handleKeydown);
+            };
+
+            // 对话框移除时清理
+            overlay.addEventListener('animationend', cleanup, { once: true });
+        });
+    }
+
     // ========== 移动端键盘处理 ==========
     function setupMobileKeyboardHandling() {
         if (window.visualViewport) {
@@ -57,6 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const sessionMenuHeader = document.querySelector('[data-target="session-menu"]');
     const personaMenu = document.getElementById('persona-menu');
     const personaMenuHeader = document.querySelector('[data-target="persona-menu"]');
+    const filesMenu = document.getElementById('files-menu');
+    const filesMenuHeader = document.querySelector('[data-target="files-menu"]');
 
     // ========== 工具函数 ==========
     // 生成随机会话ID
@@ -581,6 +691,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 await loadPersonaSettings();
             } finally {
                 setMenuIconState(personaMenuHeader, false);
+            }
+        }
+    });
+
+    filesMenuHeader?.addEventListener('click', async () => {
+        // 切换 active 类来控制显示/隐藏
+        filesMenu.classList.toggle('active');
+        // 切换图标方向
+        const arrow = filesMenuHeader.querySelector('.menu-arrow');
+        if (arrow) {
+            arrow.classList.toggle('rotate-90');
+        }
+        // 如果打开 Uploaded files 菜单，加载文件数据
+        if (filesMenu.classList.contains('active')) {
+            setMenuIconState(filesMenuHeader, true);
+            try {
+                await loadFilesSettings();
+            } finally {
+                setMenuIconState(filesMenuHeader, false);
             }
         }
     });
@@ -1556,4 +1685,328 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDark = document.body.classList.contains('dark-theme');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
+
+    // ========== Uploaded Files 管理功能 ==========
+    async function loadFilesSettings() {
+        if (!currentTokenInfo) return;
+
+        try {
+            // 获取用户的个人文件
+            const response = await fetch('/file/list?include_personal=true', {
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${currentTokenInfo.token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to load files');
+            }
+
+            const files = await response.json();
+
+            // 渲染文件列表界面
+            renderFilesList(files);
+        } catch (error) {
+            console.error('Failed to load files:', error);
+            const filesList = document.querySelector('.files-list');
+            if (filesList) {
+                filesList.innerHTML = '<div class="persona-message">Failed to load files</div>';
+            }
+        }
+    }
+
+    function renderFilesList(files) {
+        const filesList = document.querySelector('.files-list');
+        if (!filesList) return;
+
+        filesList.innerHTML = `
+            <div class="file-item new-file-item">
+                <div class="file-name new-file-preview">➕ Upload file</div>
+            </div>
+            <div class="file-items">
+                ${files.map(file => `
+                    <div class="file-item" data-file-id="${file.id}">
+                        <div class="file-name">${escapeHtml(file.file_name)}</div>
+                        <div class="file-info">
+                            <span class="file-size">${formatFileSize(file.file_size)}</span>
+                            <span class="file-time">${formatFileTime(file.created_at)}</span>
+                        </div>
+                        <div class="file-actions">
+                            <button class="delete-file-btn" title="Delete file">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        // 添加上传文件按钮事件
+        const uploadFileBtn = document.querySelector('.new-file-item');
+        uploadFileBtn.addEventListener('click', () => {
+            triggerFileUpload();
+        });
+
+        // 添加文件项点击事件（预览）
+        document.querySelectorAll('.file-item:not(.new-file-item)').forEach(item => {
+            item.addEventListener('click', (e) => {
+                // 如果点击的是删除按钮，不触发预览
+                if (e.target.closest('.delete-file-btn')) {
+                    return;
+                }
+                const fileId = item.getAttribute('data-file-id');
+                const file = files.find(f => f.id === fileId);
+                if (file) {
+                    showFilePreview(file);
+                }
+            });
+        });
+
+        // 添加删除按钮事件
+        document.querySelectorAll('.delete-file-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+
+                const fileItem = e.target.closest('.file-item');
+                const fileId = fileItem.getAttribute('data-file-id');
+                const fileName = fileItem.querySelector('.file-name').textContent;
+                const fileSize = fileItem.querySelector('.file-size').textContent;
+
+                if (fileId) {
+                    try {
+                        const confirmed = await showConfirmDialog(
+                            'Delete File',
+                            'Are you sure you want to delete this file? This action cannot be undone.',
+                            {
+                                name: fileName,
+                                size: fileSize
+                            }
+                        );
+
+                        if (confirmed) {
+                            await deleteFile(fileId);
+                        }
+                    } catch (error) {
+                        console.error('Error in delete confirmation:', error);
+                        showError('Failed to delete file: ' + error.message);
+                    }
+                } else {
+                    showError('Cannot delete file: File ID not found');
+                }
+            });
+        });
+    }
+
+    function triggerFileUpload() {
+        // 创建隐藏的文件输入元素
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.className = 'file-upload-input';
+        fileInput.accept = '.jpeg,.jpg,.png,.gif,.webp,.mp3,.wav,.ogg,.mp4,.webm,.pdf,.txt,.doc,.docx';
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                await uploadFile(file);
+            }
+            // 清理输入元素
+            fileInput.remove();
+        });
+
+        // 触发文件选择
+        fileInput.click();
+    }
+
+    async function uploadFile(file) {
+        if (!currentTokenInfo) {
+            showError('Please login to upload files');
+            return;
+        }
+
+        // 检查文件大小（100MB限制）
+        if (file.size > 100 * 1024 * 1024) {
+            showError('File size cannot exceed 100MB');
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            // 作为个人文件上传，不关联会话
+            formData.append('session_id', '');
+
+            const response = await fetch('/file/upload', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${currentTokenInfo.token}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Upload failed');
+            }
+
+            const uploadedFile = await response.json();
+            showError('File uploaded successfully');
+
+            // 刷新文件列表
+            await loadFilesSettings();
+
+        } catch (error) {
+            console.error('File upload failed:', error);
+            showError('Upload failed: ' + error.message);
+        }
+    }
+
+    async function deleteFile(fileId) {
+        if (!currentTokenInfo) {
+            showError('Please login to delete files');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/file/${fileId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${currentTokenInfo.token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Delete failed');
+            }
+
+            showError('File deleted successfully');
+
+            // 刷新文件列表
+            await loadFilesSettings();
+
+        } catch (error) {
+            console.error('File delete failed:', error);
+            showError('Delete failed: ' + error.message);
+        }
+    }
+
+    function showFilePreview(file) {
+        const modalHtml = `
+            <div id="file-preview-modal" class="file-preview-modal">
+                <div class="file-preview-content">
+                    <div class="file-preview-header">
+                        <h3 class="file-preview-title">${escapeHtml(file.file_name)}</h3>
+                        <button class="close-preview-btn">&times;</button>
+                    </div>
+                    <div class="file-preview-body">
+                        ${getFilePreviewContent(file)}
+                    </div>
+                    <div class="file-preview-footer">
+                        <div class="file-info">
+                            <span>Size: ${formatFileSize(file.file_size)}</span>
+                            <span>Uploaded: ${formatFileTime(file.created_at)}</span>
+                        </div>
+                        <a href="${file.file_url}" class="download-file-btn" download="${file.file_name}">
+                            <svg viewBox="0 0 24 24" width="16" height="16">
+                                <path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                            </svg>
+                            Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // 移除现有模态框
+        const existingModal = document.getElementById('file-preview-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // 添加新模态框
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = document.getElementById('file-preview-modal');
+
+        // 添加事件监听
+        const closeBtn = modal.querySelector('.close-preview-btn');
+        closeBtn.addEventListener('click', () => {
+            modal.remove();
+        });
+
+        // 点击模态框外部关闭
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // 阻止模态框内容点击事件冒泡
+        const modalContent = modal.querySelector('.file-preview-content');
+        modalContent.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+
+    function getFilePreviewContent(file) {
+        const mimeType = file.mime_type.toLowerCase();
+
+        if (mimeType.startsWith('image/')) {
+            return `<img src="${file.file_url}" alt="${file.file_name}" class="file-preview-image" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'file-preview-generic\\'><svg viewBox=\\'0 0 24 24\\'><path fill=\\'currentColor\\' d=\\'M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z\\'/></svg><p>Image preview not available</p><p>Download to view the file</p></div>';" />`;
+        }
+        else if (mimeType === 'text/plain') {
+            // 对于文本文件，尝试加载内容
+            return `<div class="file-preview-text">Loading text content...</div>`;
+        }
+        else if (mimeType === 'application/pdf') {
+            return `<div class="file-preview-generic">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/>
+                </svg>
+                <p>PDF preview not available</p>
+                <p>Download to view the file</p>
+            </div>`;
+        }
+        else {
+            return `<div class="file-preview-generic">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                </svg>
+                <p>Preview not available for this file type</p>
+                <p>Download to view the file</p>
+            </div>`;
+        }
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function formatFileTime(timestamp) {
+        const date = new Date(timestamp);
+        if (Number.isNaN(date.getTime())) {
+            return 'Unknown';
+        }
+        // 转换为北京时间 (UTC+8) 并格式化为 yy-mm-dd
+        const beijingDate = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+        const year = beijingDate.getFullYear().toString().slice(-2);
+        const month = String(beijingDate.getMonth() + 1).padStart(2, '0');
+        const day = String(beijingDate.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&")
+            .replace(/</g, "<")
+            .replace(/>/g, ">")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 });

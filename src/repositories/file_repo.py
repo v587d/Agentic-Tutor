@@ -519,3 +519,37 @@ async def get_personal_files(
 
         result = await session.execute(stmt)
         return list(result.scalars().all())
+
+
+async def get_all_files() -> List[UserFile]:
+    """
+    获取所有文件记录
+    
+    返回:
+        List[UserFile]: 所有文件列表
+    """
+    async with db_manager.session as session:
+        stmt = select(UserFile).order_by(desc(UserFile.created_at))
+        result = await session.execute(stmt)
+        return list(result.scalars().all())
+
+
+async def update_file_url(file_id: str, new_file_url: str) -> bool:
+    """
+    更新文件的URL
+    
+    参数:
+        file_id: 文件ID
+        new_file_url: 新的文件URL
+        
+    返回:
+        bool: 更新是否成功
+    """
+    async with db_manager.session as session:
+        user_file = await session.get(UserFile, file_id)
+        if not user_file:
+            return False
+        
+        user_file.file_url = new_file_url
+        await session.commit()
+        return True

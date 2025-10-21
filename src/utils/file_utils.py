@@ -126,8 +126,14 @@ async def save_uploaded_file(
 
 def get_file_download_url(file_path: str) -> str:
     """生成文件下载URL"""
-    # 使用文件路径作为标识符，确保唯一性
-    return file_path
+    # 将文件路径转换为静态文件访问路径
+    # 文件路径格式: static\uploading\{user_id}\{session_id}\{file_id}_{filename} (Windows)
+    # 或: static/uploading/{user_id}/{session_id}/{file_id}_{filename} (Unix)
+    # 下载URL格式: /static/uploading/{user_id}/{session_id}/{file_id}_{filename}
+    
+    # 将Windows路径分隔符\转换为URL路径分隔符/
+    normalized_path = file_path.replace('\\', '/')
+    return f"/{normalized_path}"
 
 
 async def delete_user_file(file_path: str) -> bool:
