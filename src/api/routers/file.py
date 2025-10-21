@@ -1,19 +1,20 @@
 from typing import List, Optional
+
 from fastapi import APIRouter, HTTPException, status, Depends, UploadFile, File, Form
 from fastapi.responses import FileResponse
 
-from src.db.models import User
-from src.schemas.file import UserFilePublic, FileType
-from src.repositories import file_repo
-from src.api.routers.auth import get_current_user
-from src.utils.file_utils import (
+from ...db import User
+from ...schemas import UserFilePublic, FileType
+from ...repositories import file_repo
+from .auth import get_current_user
+from ...utils import (
+    logger,
     save_uploaded_file, 
     get_file_download_url,
     delete_user_file as delete_file_from_storage,
     ensure_upload_directories,
     FileUploadError
 )
-from src.utils.logger import logger
 
 router = APIRouter(prefix="/file", tags=["file"])
 
