@@ -15,7 +15,9 @@
     },
     // --- 终端 ---
     "terminal.integrated.defaultProfile.windows": "PowerShell", // Windows下默认终端为PowerShell
-    "terminal.integrated.fontSize": 14, // 终端字体大小
+    "terminal.integrated.fontSize": 16, // 终端字体大小
+    "terminal.integrated.letterSpacing": 1.2, // 字符间距
+    "terminal.integrated.lineHeight": 1.2,
     // --- python ---
     "python.analysis.extraPaths": [
         "./src"

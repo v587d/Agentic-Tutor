@@ -17,6 +17,6 @@ logs/
 .idea/
 database/
 
-design_doc/
+docs/
 uploading/
 temp_deleted_files/
