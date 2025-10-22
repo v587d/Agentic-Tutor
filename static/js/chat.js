@@ -243,27 +243,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Persona专用的成功提示方法
-    function personaShowSuccess(message) {
-        const saveBtn = document.getElementById('save-persona');
-        if (saveBtn) {
-            // 保存原始状态
-            const originalText = saveBtn.textContent;
-            const originalBgColor = saveBtn.style.backgroundColor;
-            const originalDisabled = saveBtn.disabled;
+    // function personaShowSuccess(message) {
+    //     const saveBtn = document.getElementById('save-persona');
+    //     if (saveBtn) {
+    //         // 保存原始状态
+    //         const originalText = saveBtn.textContent;
+    //         const originalBgColor = saveBtn.style.backgroundColor;
+    //         const originalDisabled = saveBtn.disabled;
 
-            // 设置成功状态
-            saveBtn.textContent = message;
-            saveBtn.style.backgroundColor = '#4CAF50';
-            saveBtn.disabled = true;
+    //         // 设置成功状态
+    //         saveBtn.textContent = message;
+    //         saveBtn.style.backgroundColor = '#4CAF50';
+    //         saveBtn.disabled = true;
 
-            // 立即关闭模态框并刷新列表
-            const modal = document.getElementById('persona-modal');
-            if (modal) {
-                modal.remove();
-            }
-            loadPersonaSettings(); // 刷新列表
-        }
-    }
+    //         // 立即关闭模态框并刷新列表
+    //         const modal = document.getElementById('persona-modal');
+    //         if (modal) {
+    //             modal.remove();
+    //         }
+    //         loadPersonaSettings(); // 刷新列表
+    //     }
+    // }
 
     // ========== UI 操作函数 ==========
     function addMessage(content, isUser = false) {
@@ -1282,7 +1282,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <h4>Meta Information</h4>
                                 <div class="form-group">
                                     <label for="notes">Notes:</label>
-                                    <input id="notes" name="notes" placeholder="Additional notes about this persona">${meta.notes || ''}</input>
+                                    <input type="text" id="notes" name="notes" placeholder="Additional notes about this persona" value="${meta.notes || ''}">
                                 </div>
                             </div>
                         </form>
@@ -1589,7 +1589,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 使用persona专用成功提示
-            personaShowSuccess('Update persona successfully~');
+            // personaShowSuccess('Update persona successfully~');
+            const modal = document.getElementById('persona-modal');
+            if (modal) {
+                modal.remove();
+            }
+            loadPersonaSettings(); // 刷新列表
 
         } catch (error) {
             console.error('Failed to save persona:', error);
@@ -1597,33 +1602,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function setDefaultPersona(personaId) {
-        if (!currentTokenInfo) return;
+    // async function setDefaultPersona(personaId) {
+    //     if (!currentTokenInfo) return;
 
-        try {
-            const response = await fetch(`user/persona/${personaId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${currentTokenInfo.token}`
-                },
-                body: JSON.stringify({
-                    is_default: true
-                })
-            });
+    //     try {
+    //         const response = await fetch(`user/persona/${personaId}`, {
+    //             method: 'PUT',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': `Bearer ${currentTokenInfo.token}`
+    //             },
+    //             body: JSON.stringify({
+    //                 is_default: true
+    //             })
+    //         });
 
-            if (!response.ok) {
-                throw new Error('Failed to set default persona');
-            }
+    //         if (!response.ok) {
+    //             throw new Error('Failed to set default persona');
+    //         }
 
-            // 不再显示成功提示，静默刷新列表
-            loadPersonaSettings(); // 刷新列表
+    //         // 不再显示成功提示，静默刷新列表
+    //         loadPersonaSettings(); // 刷新列表
 
-        } catch (error) {
-            console.error('Failed to set default persona:', error);
-            showError('Failed to set default persona');
-        }
-    }
+    //     } catch (error) {
+    //         console.error('Failed to set default persona:', error);
+    //         showError('Failed to set default persona');
+    //     }
+    // }
 
     // 保存默认persona状态
     async function saveDefaultPersona(personaId, isDefault) {
